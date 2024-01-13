@@ -1,0 +1,12 @@
+{% extends 'main.html' %}
+{% block content %}
+  <div class="row">
+    <div class="col-md-6">
+        <div class="card card-body">
+            {% csrf_token %}
+         Email activé !
+            {{user.is_active}}
+        </div>
+    </div>
+  </div>
+{% endblock %}

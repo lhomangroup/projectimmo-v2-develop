@@ -1,0 +1,225 @@
+{% extends 'main.html' %}
+{% block content %}
+
+<hr>
+<div class="container bootstrap snippet">
+    <div class="row">
+  		<div class="col-sm-10"><h1>{{request.user.first_name}} {{request.user.last_name}}</h1></div>
+    </div>
+    <div class="row">
+  		<div class="col-sm-3"><!--left col-->
+
+
+      <div class="text-center">
+        <img src="{{request.user.photo_profil.url}}" class="avatar img-circle img-thumbnail" alt="avatar">
+      </div></hr><br>
+
+
+          <div class="card mb-3">
+            <div class="card-header">Coordonnées <i class="fa fa-link fa-1x"></i></div>
+            <div class="card-body"><span><small id="emailHelp" class="form-text text-muted">Votre adresse actuelle : {{ address.rue }} {{address.voie}}, {{address.ville}} - {{address.zipCode}}</small></span>
+            <hr>
+                <small class="form-text text-muted">téléphone - {{request.user.telephone}}</small>
+                <hr>
+                <small class="form-text text-muted">Email - {{request.user.email}}</small>
+            </div>
+          </div>
+
+
+          <ul class="list-group">
+            <li class="list-group-item text-muted">Activité <i class="fa fa-dashboard fa-1x"></i></li>
+              <li class="list-group-item "><span class=""><strong>Annonces</strong></span> <span class="pull-right">{{annonce|length}}</span></li>
+            <li class="list-group-item"><span class="pull-left"><strong>Location</strong></span>
+                {% if reservation.reserved %} <span class="bg-success text-white p-2">En cours</span>
+                {% else %} <span class="bg-secondary text-white p-3">Aucune location</span></li> {% endif %}
+          </ul>
+
+
+        </div><!--/col-3-->
+    	<div class="col-sm-9">
+            <ul class="nav nav-tabs">
+                <li class="nav-item active"><a data-toggle="tab" href="#home" class="nav-link">Informations utilisateur</a></li>
+                <li class="nav-item"><a data-toggle="tab" href="#messages" class="nav-link">Locations</a></li>
+                <li class="nav-item"><a data-toggle="tab" href="#settings" class="nav-link">Workflow</a></li>
+                <li class="nav-item"><a data-toggle="tab" href="#diagnostic" class="nav-link">Diagnostic</a></li>
+              </ul>
+
+
+          <div class="tab-content">
+            <div class="tab-pane active" id="home">
+                <hr>
+                      <div class="col-6">
+                          <h2>Nom : {{request.user.last_name}}</h2>
+                      </div>
+              <hr>
+                <div class="col-6">
+                          <h2>Prenom : {{request.user.first_name}}</h2>
+                      </div>
+              <hr>
+                <div class="col-6">
+                          <h3>Type locataire :{{request.user.get_typelocataire_display}}</h3>
+                      </div>
+
+             </div><!--/tab-pane-->
+
+             <div class="tab-pane" id="messages">
+
+               <h2></h2>
+
+               <hr>
+                <div class="col-md-4 col-sm-6 mb-4 pb-2">
+                    <div class="list-card bg-white h-100 rounded overflow-hidden position-relative shadow-sm">
+                        <div class="list-card-image">
+                            <div class="star position-absolute"><span class="badge badge-success"><i class="icofont-star"></i> 3.1 (300+)</span></div>
+                            <div class="favourite-heart text-danger position-absolute"><a href="#"><i class="icofont-heart"></i></a></div>
+                            <div class="member-plan position-absolute"><span class="badge badge-dark">{{reservation.categorie_logement}}</span></div>
+                                <a href="#">
+                                            <img src="img/list/5.png" class="img-fluid item-img">
+                                        </a>
+                                    </div>
+                                    <div class="p-3 position-relative">
+                                        <div class="list-card-body">
+                                            <h6 class="mb-1"><a href="#" class="text-black">{{reservation.titre_logement}}</a></h6>
+                                            <p class="text-gray mb-3">Services :{% for categorie in reservation.categorie_service.all %} {{categorie.nom}},  {% endfor %}</p>
+                                            <p class="text-gray mb-3 time"><span class="bg-light text-dark rounded-sm pl-2 pb-1 pt-1 pr-2"><i class="icofont-wall-clock"></i> {{reservation.loyer_tc}} €</span> <span class="float-right text-black-50"> {{reservation.nombre_personne}} personne(s)</span></p>
+                                        </div>
+                                        <div class="list-card-badge">
+                                            <span class="badge badge-success">{{reservation.get_hebergement_choice_display}}</span>                 <small id="emailHelp" class="form-text text-muted"> {{ reservation.address.rue }} {{reservation.address.voie}}, {{reservation.address.ville}} - {{reservation.address.zipCode}}</small>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+             </div><!--/tab-pane-->
+             <div class="tab-pane" id="settings">
+                  <hr>
+                 {% load crispy_forms_tags %}
+                 {% load widget_tweaks %}
+
+                  <form class="form" action="##" method="post" id="registrationForm">
+                    {% for field in form %}
+                      {% if field == form.planificateur_visite %}
+                            <div class="col-12">
+                                <p>Jours de visite : {{ workflow.planificateur_visite }}</p>
+                            </div>
+                      {% elif field == form.user %}
+                            <div></div>
+                      {% elif field == form.type_visite %}
+                            <div class="col-12">
+                                <p>Type de visite : {{ workflow.get_type_visite_display}}</p>
+                            </div>
+                      {% elif field == form.document_paye or field == form.document_avis or field == form.document_quittance %}
+                            <div class="col-12">
+                                <p class="bg-dark text-white">Fichiers</p>
+                            </div>
+
+                      {% else %}
+                      {{ field|attr:"readonly"|as_crispy_field }}
+                      {% endif %}
+                      {% endfor %}
+              	</form>
+                    <hr>
+                 <span>Votre adresse actuelle : {{ workflow.address.rue }} {{workflow.address.voie}}, {{workflow.address.ville}} - {{workflow.address.zipCode}}</span>
+                    <hr>
+                    Date de réunion sélectionnée : {{ workflow.date_reunion }}
+                    <hr>
+                 <h2>Commentaires : </h2>
+                    {% for nek in workflow.commentaire_nek.all %}
+                       <div class="col-6 mt-2">
+                        <div class="list-group">
+                          <a href="#" class="list-group-item list-group-item-action flex-column align-items-start">
+                            <div class="d-flex w-100 justify-content-between">
+                              <small class="text-danger">Nek</small>
+                            </div>
+                            <p class="mb-1">{{nek.commentaire}}</p>
+                            <small>{{forloop.counter}}</small>
+                          </a>
+                        </div>
+                           </div>
+                    {% endfor %}
+                    {% for demeya in workflow.commentaire_demaya.all %}
+                       <div class="offset-6 col-6 mt-2">
+                        <div class="list-group">
+                          <a href="#" class="list-group-item list-group-item-action flex-column bg-success align-items-start">
+                            <div class="d-flex w-100 justify-content-between">
+                              <small class="text-warning">Demeya</small>
+                            </div>
+                            <p class="mb-1 text-white">{{demeya.commentaire}}</p>
+                            <small>{{forloop.counter}}</small>
+                          </a>
+                        </div>
+                           </div>
+                    {% endfor %}
+
+              </div>
+        <div class="tab-pane" id="diagnostic">
+                <hr>
+            <form method="post" action="">
+                {% csrf_token %}
+                      <div class="col-12" id="nek_resp">
+                        <label for="commentaire_nek">Bilan semaine</label>
+                        <div class="row">
+                            <div class="col-8">
+                                <textarea class="form-control" name="commentaire_bilan" required></textarea>
+                                <input type="datetime-local" id="bilan-semaine"
+                                   name="bilan_semaine" value="2020-06-12T19:30"
+                                   min="2020-06-07T00:00">
+                            </div>
+                            <div class="col-4">
+                                <button type="button" class="btn btn-primary add"> + </button>
+                                <button type="button" class="btn btn-danger remove"> - </button>
+                            </div>
+                        </div>
+                        <input type="hidden" value="1" id="total_chq">
+                    </div>
+                <input type="submit" name="Envoyer" class="btn btn-primary mt-3 mb-5">
+            </form>
+            <h2>Bilan actuels : </h2>
+                    {% for nek in workflow.bilan_semaine.all %}
+                       <div class="col-6 mt-2">
+                        <div class="list-group">
+                          <a href="#" class="list-group-item list-group-item-action flex-column align-items-start">
+                            <div class="d-flex w-100 justify-content-between">
+                              <small class="text-danger">{{nek.date}}</small>
+                            </div>
+                            <p class="mb-1">{{nek.commentaire}}</p>
+                            <small>{{forloop.counter}}</small>
+                          </a>
+                        </div>
+                           </div>
+                    {% endfor %}
+             </div><!--/tab-pane-->
+
+              </div><!--/tab-pane-->
+
+          </div><!--/tab-content-->
+
+        </div><!--/col-9-->
+    </div><!--/row-->
+<script>
+    window.addEventListener('load', (event) => {
+
+    $('.add').on('click', add);
+    $('.remove').on('click', remove);
+        function add(){
+          var new_resp = parseInt($('#total_chq').val())+1;
+          var new_input="<div id='new_" + new_resp +  "' class='col-8 mb-1 mt-1'> \
+            <textarea class='form-control' name='commentaire_bilan' required></textarea> \
+                                <input type='datetime-local' id='bilan-semaine' \
+                                   name='bilan_semaine' value='2020-06-12T19:30' \
+                                   min='2020-06-07T00:00'> \
+          </div>"
+
+          $('#nek_resp').append(new_input);
+          $('#total_chq').val(new_resp)
+        }
+        function remove(){
+          var resp = $('#total_chq').val();
+          if(resp>1){
+            $('#new_'+resp).remove();
+            $('#total_chq').val(resp-1);
+          }
+          }
+     })
+    </script>
+{% endblock %}
